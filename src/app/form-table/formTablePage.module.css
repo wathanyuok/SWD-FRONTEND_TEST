@@ -19,9 +19,9 @@
     box-shadow: 0 2px 16px rgba(0,0,0,0.08);
   }
   .tableBox {
-    width: 80vw;           /* เต็มจอ */
-    max-width: none;        /* ไม่จำกัดความกว้าง */
-    margin: 32px 0 0 0;     /* ไม่มี auto ซ้าย-ขวา */
+    width: 80vw;           
+    max-width: none;        
+    margin: 32px 0 0 0;     
     background: transparent;
     border-radius: 0;
     padding: 0 0 32px 0;

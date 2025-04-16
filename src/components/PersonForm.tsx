@@ -4,12 +4,11 @@ import { useTranslation } from 'react-i18next';
 import { v4 as uuidv4 } from 'uuid';
 import { useDispatch } from 'react-redux';
 import { addPerson, updatePerson } from '@/app/store/personSlice';
-import dayjs from 'dayjs'; // Import Day.js
+import dayjs from 'dayjs'; 
 import "flag-icons/css/flag-icons.min.css";
 
 const { Option } = Select;
 
-// Define country options for phone code selection
 const countryOptions = [
   { value: "+66", label: "Thailand", flag: "th" },
   { value: "+1", label: "USA", flag: "us" },
@@ -17,14 +16,12 @@ const countryOptions = [
   { value: "+84", label: "Vietnam", flag: "vn" },
 ];
 
-// Define nationalities for nationality selection
 const nationalities = [
   { value: "thai", label: "Thai" },
   { value: "lao", label: "Lao" },
   { value: "other", label: "Other" },
 ];
 
-// Required label component
 const Required = ({ children }: { children: React.ReactNode }) => (
   <span>
     <span style={{ color: "red" }}></span> {children}
@@ -55,9 +52,7 @@ const PersonForm = ({ editingPerson = null, onFinishForm = () => {} }) => {
     }
   }, [editingPerson, form]);
 
-  // Handle form submission
   const handleSubmit = (values) => {
-    // Combine citizenId parts into a single string
     const citizenId = [
       values.citizenId1,
       values.citizenId2,
@@ -66,19 +61,16 @@ const PersonForm = ({ editingPerson = null, onFinishForm = () => {} }) => {
       values.citizenId5,
     ].join('-');
 
-    // Combine phone code and phone number
     const phone = `${values.phoneCode}-${values.phoneNumber}`;
 
-    // Create or update person data
     const personData = {
       id: editingPerson?.id || uuidv4(),
       ...values,
       citizenId,
       phone,
-      dob: values.dob ? values.dob.format("YYYY-MM-DD") : null, // Convert date back to string
+      dob: values.dob ? values.dob.format("YYYY-MM-DD") : null, 
     };
 
-    // Dispatch action to Redux store
     if (editingPerson) {
       dispatch(updatePerson(personData));
     } else {
@@ -98,10 +90,9 @@ const PersonForm = ({ editingPerson = null, onFinishForm = () => {} }) => {
         prefix: "",
         gender: "male",
         nationality: "",
-        phoneCode: "+66", // Initial value for phone code
+        phoneCode: "+66", 
       }}
     >
-      {/* Row 1: Title, Firstname, Lastname */}
       <Row gutter={16}>
         <Col span={4}>
           <Form.Item
@@ -136,7 +127,6 @@ const PersonForm = ({ editingPerson = null, onFinishForm = () => {} }) => {
         </Col>
       </Row>
 
-      {/* Row 2: Birthday, Nationality */}
       <Row gutter={16}>
         <Col span={6}>
           <Form.Item
@@ -147,7 +137,7 @@ const PersonForm = ({ editingPerson = null, onFinishForm = () => {} }) => {
             <DatePicker
               style={{ width: "100%" }}
               format="YYYY-MM-DD"
-              placeholder={t("selectDate")} // Use translation key
+              placeholder={t("selectDate")} 
             />
           </Form.Item>
         </Col>
@@ -166,7 +156,6 @@ const PersonForm = ({ editingPerson = null, onFinishForm = () => {} }) => {
         </Col>
       </Row>
 
-      {/* Row 3: CitizenID (5 fields) */}
       <Row gutter={8}>
         <Col span={4}>
           <Form.Item name="citizenId1" label={t("citizenId")}>
@@ -195,7 +184,6 @@ const PersonForm = ({ editingPerson = null, onFinishForm = () => {} }) => {
         </Col>
       </Row>
 
-      {/* Row 4: Gender */}
       <Row gutter={16}>
         <Col span={8}>
           <Form.Item
@@ -212,7 +200,6 @@ const PersonForm = ({ editingPerson = null, onFinishForm = () => {} }) => {
         </Col>
       </Row>
 
-      {/* Row 5: Mobile Phone (2 fields) */}
       <Row gutter={8} align="middle">
         <Col flex="160px">
           <Form.Item
@@ -222,7 +209,7 @@ const PersonForm = ({ editingPerson = null, onFinishForm = () => {} }) => {
           >
             <Select
               style={{ width: "100%" }}
-              popupMatchSelectWidth={false} // Replace deprecated API
+              popupMatchSelectWidth={false} 
               optionLabelProp="label"
             >
               {countryOptions.map((c) => (
@@ -248,7 +235,6 @@ const PersonForm = ({ editingPerson = null, onFinishForm = () => {} }) => {
         </Col>
       </Row>
 
-      {/* Row 6: Passport No. */}
       <Row gutter={16}>
         <Col span={8}>
           <Form.Item name="passportNo" label={t("passportNo")}>
@@ -257,7 +243,6 @@ const PersonForm = ({ editingPerson = null, onFinishForm = () => {} }) => {
         </Col>
       </Row>
 
-      {/* Row 7: Expected Salary */}
       <Row gutter={16}>
         <Col span={8}>
           <Form.Item
@@ -270,7 +255,6 @@ const PersonForm = ({ editingPerson = null, onFinishForm = () => {} }) => {
         </Col>
       </Row>
 
-      {/* Submit and Reset Buttons */}
       <div style={{ display: "flex", justifyContent: "flex-end", gap: 12 }}>
         <Button htmlType="reset">{t("clear")}</Button>
         <Button type="primary" htmlType="submit">
