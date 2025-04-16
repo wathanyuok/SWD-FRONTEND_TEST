@@ -35,7 +35,6 @@ const PersonForm = ({ editingPerson = null, onFinishForm = () => {} }) => {
 
   useEffect(() => {
     if (editingPerson) {
-      // Split citizenId into 5 parts for input fields
       const citizenIdParts = editingPerson.citizenId ? editingPerson.citizenId.split('-') : [];
       const formValues = {
         ...editingPerson,
@@ -44,7 +43,7 @@ const PersonForm = ({ editingPerson = null, onFinishForm = () => {} }) => {
         citizenId3: citizenIdParts[2] || '',
         citizenId4: citizenIdParts[3] || '',
         citizenId5: citizenIdParts[4] || '',
-        dob: editingPerson.dob ? dayjs(editingPerson.dob) : null, // Convert date to Day.js Object
+        dob: editingPerson.dob ? dayjs(editingPerson.dob) : null, 
       };
       form.setFieldsValue(formValues);
     } else {
