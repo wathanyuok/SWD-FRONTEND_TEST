@@ -8,10 +8,8 @@ const LanguageSwitcher = () => {
   const { i18n } = useTranslation();
   const router = useRouter();
 
-  // กำหนดค่าเริ่มต้นของภาษา
   const [language, setLanguage] = useState(i18n.language || "en");
 
-  // โหลดค่าภาษาหลังจาก Component Mount
   useEffect(() => {
     const savedLanguage = localStorage.getItem("i18nextLng") || "en";
     setLanguage(savedLanguage);
@@ -20,13 +18,12 @@ const LanguageSwitcher = () => {
 
   return (
     <div className={styles.topBar}>
-      {/* ใช้ suppressHydrationWarning เพื่อปิดคำเตือน */}
       <Select
         value={language}
         onChange={(lng) => {
           setLanguage(lng);
           i18n.changeLanguage(lng);
-          localStorage.setItem("i18nextLng", lng); // บันทึกค่าภาษาลง Local Storage
+          localStorage.setItem("i18nextLng", lng); 
         }}
         style={{ width: 80 }}
         options={[

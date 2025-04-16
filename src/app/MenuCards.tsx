@@ -8,7 +8,6 @@ const MenuCards = () => {
   const { t, i18n } = useTranslation();
   const [menus, setMenus] = useState([]);
 
-  // Load translations after component mounts
   useEffect(() => {
     const loadedMenus = [
       { title: t("test1"), desc: t("desc1"), link: "/layout-style" },
@@ -16,13 +15,13 @@ const MenuCards = () => {
       { title: t("test3"), desc: t("desc3"), link: "/form-table" },
     ];
     setMenus(loadedMenus);
-  }, [i18n.language]); // Re-run when language changes
+  }, [i18n.language]); 
 
   return (
     <div className={styles.menuContainer}>
       {menus.map((menu, idx) => (
         <Link href={menu.link} key={idx} className={styles.cardLink}>
-          {/* Use updated API for Card styles */}
+         
           <Card
             title={<span suppressHydrationWarning>{menu.title}</span>}
             className={styles.menuCard}

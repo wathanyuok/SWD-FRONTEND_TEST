@@ -4,11 +4,12 @@ import { useTranslation } from 'react-i18next';
 import { v4 as uuidv4 } from 'uuid';
 import { useDispatch } from 'react-redux';
 import { addPerson, updatePerson } from '@/app/store/personSlice';
-
+import dayjs from 'dayjs'; // Import Day.js
 import "flag-icons/css/flag-icons.min.css";
 
 const { Option } = Select;
 
+// Define country options for phone code selection
 const countryOptions = [
   { value: "+66", label: "Thailand", flag: "th" },
   { value: "+1", label: "USA", flag: "us" },
@@ -16,12 +17,14 @@ const countryOptions = [
   { value: "+84", label: "Vietnam", flag: "vn" },
 ];
 
+// Define nationalities for nationality selection
 const nationalities = [
   { value: "thai", label: "Thai" },
   { value: "lao", label: "Lao" },
   { value: "other", label: "Other" },
 ];
 
+// Required label component
 const Required = ({ children }: { children: React.ReactNode }) => (
   <span>
     <span style={{ color: "red" }}></span> {children}
@@ -35,7 +38,7 @@ const PersonForm = ({ editingPerson = null, onFinishForm = () => {} }) => {
 
   useEffect(() => {
     if (editingPerson) {
-      // แยกข้อมูล citizenId กลับเป็น 5 ช่อง
+      // Split citizenId into 5 parts for input fields
       const citizenIdParts = editingPerson.citizenId ? editingPerson.citizenId.split('-') : [];
       const formValues = {
         ...editingPerson,
@@ -44,6 +47,7 @@ const PersonForm = ({ editingPerson = null, onFinishForm = () => {} }) => {
         citizenId3: citizenIdParts[2] || '',
         citizenId4: citizenIdParts[3] || '',
         citizenId5: citizenIdParts[4] || '',
+        dob: editingPerson.dob ? dayjs(editingPerson.dob) : null, // Convert date to Day.js Object
       };
       form.setFieldsValue(formValues);
     } else {
@@ -51,8 +55,9 @@ const PersonForm = ({ editingPerson = null, onFinishForm = () => {} }) => {
     }
   }, [editingPerson, form]);
 
+  // Handle form submission
   const handleSubmit = (values) => {
-    // รวมข้อมูล citizenId
+    // Combine citizenId parts into a single string
     const citizenId = [
       values.citizenId1,
       values.citizenId2,
@@ -61,18 +66,19 @@ const PersonForm = ({ editingPerson = null, onFinishForm = () => {} }) => {
       values.citizenId5,
     ].join('-');
 
-    // รวมข้อมูลเบอร์โทร
+    // Combine phone code and phone number
     const phone = `${values.phoneCode}-${values.phoneNumber}`;
 
-    // สร้างหรืออัปเดตข้อมูล
+    // Create or update person data
     const personData = {
       id: editingPerson?.id || uuidv4(),
       ...values,
       citizenId,
       phone,
+      dob: values.dob ? values.dob.format("YYYY-MM-DD") : null, // Convert date back to string
     };
 
-    // ส่ง action ไปยัง Redux store
+    // Dispatch action to Redux store
     if (editingPerson) {
       dispatch(updatePerson(personData));
     } else {
@@ -92,7 +98,7 @@ const PersonForm = ({ editingPerson = null, onFinishForm = () => {} }) => {
         prefix: "",
         gender: "male",
         nationality: "",
-        phoneCode: "+66",
+        phoneCode: "+66", // Initial value for phone code
       }}
     >
       {/* Row 1: Title, Firstname, Lastname */}
@@ -138,7 +144,11 @@ const PersonForm = ({ editingPerson = null, onFinishForm = () => {} }) => {
             label={<Required>{t("dob")}</Required>}
             rules={[{ required: true, message: t("dobRequired") }]}
           >
-            <DatePicker style={{ width: "100%" }} format="YYYY-MM-DD" />
+            <DatePicker
+              style={{ width: "100%" }}
+              format="YYYY-MM-DD"
+              placeholder={t("selectDate")} // Use translation key
+            />
           </Form.Item>
         </Col>
         <Col span={6}>
@@ -156,7 +166,7 @@ const PersonForm = ({ editingPerson = null, onFinishForm = () => {} }) => {
         </Col>
       </Row>
 
-      {/* Row 3: CitizenID (5 ช่อง) */}
+      {/* Row 3: CitizenID (5 fields) */}
       <Row gutter={8}>
         <Col span={4}>
           <Form.Item name="citizenId1" label={t("citizenId")}>
@@ -202,7 +212,7 @@ const PersonForm = ({ editingPerson = null, onFinishForm = () => {} }) => {
         </Col>
       </Row>
 
-      {/* Row 5: Mobile Phone (2 ช่อง) */}
+      {/* Row 5: Mobile Phone (2 fields) */}
       <Row gutter={8} align="middle">
         <Col flex="160px">
           <Form.Item
@@ -212,9 +222,8 @@ const PersonForm = ({ editingPerson = null, onFinishForm = () => {} }) => {
           >
             <Select
               style={{ width: "100%" }}
-              dropdownMatchSelectWidth={false}
+              popupMatchSelectWidth={false} // Replace deprecated API
               optionLabelProp="label"
-              defaultValue="+66"
             >
               {countryOptions.map((c) => (
                 <Option key={c.value} value={c.value} label={c.value}>
@@ -247,7 +256,7 @@ const PersonForm = ({ editingPerson = null, onFinishForm = () => {} }) => {
           </Form.Item>
         </Col>
       </Row>
-      
+
       {/* Row 7: Expected Salary */}
       <Row gutter={16}>
         <Col span={8}>
@@ -261,6 +270,7 @@ const PersonForm = ({ editingPerson = null, onFinishForm = () => {} }) => {
         </Col>
       </Row>
 
+      {/* Submit and Reset Buttons */}
       <div style={{ display: "flex", justifyContent: "flex-end", gap: 12 }}>
         <Button htmlType="reset">{t("clear")}</Button>
         <Button type="primary" htmlType="submit">

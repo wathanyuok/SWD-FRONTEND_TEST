@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Select, Button } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'next/navigation';
@@ -10,7 +10,15 @@ import PersonTable from '@/components/PersonTable';
 export default function FormTablePage() {
   const { t, i18n } = useTranslation();
   const router = useRouter();
+  const [language, setLanguage] = useState(i18n.language || 'en'); // กำหนดค่าเริ่มต้นของภาษา
   const [editingPerson, setEditingPerson] = useState(null);
+
+  // Load language from Local Storage after component mounts
+  useEffect(() => {
+    const savedLanguage = localStorage.getItem("i18nextLng") || "en";
+    setLanguage(savedLanguage);
+    i18n.changeLanguage(savedLanguage);
+  }, [i18n]);
 
   const handleEditPerson = (person) => {
     setEditingPerson(person);
@@ -24,24 +32,32 @@ export default function FormTablePage() {
   return (
     <div className={styles.gradientBg}>
       <div className={styles.topBar}>
+        {/* Use value instead of defaultValue */}
         <Select
-          defaultValue={i18n.language === 'th' ? 'th' : 'en'}
+          value={language} // ใช้ State แทน defaultValue
           style={{ width: 80 }}
-          onChange={lng => i18n.changeLanguage(lng)}
+          onChange={(lng) => {
+            setLanguage(lng);
+            i18n.changeLanguage(lng);
+          }}
           options={[
             { value: 'en', label: 'EN' },
-            { value: 'th', label: 'ไทย' }
+            { value: 'th', label: 'ไทย' },
           ]}
+          popupMatchSelectWidth={false} // Replace deprecated API
           className={styles.langSelect}
         />
         <Button
           className={styles.homeBtn}
           onClick={() => router.push('/')}
         >
-          {i18n.language === 'th' ? 'หน้าหลัก' : 'Home'}
+          {language === 'th' ? 'หน้าหลัก' : 'Home'}
         </Button>
       </div>
-      <div className={styles.title}>{t('formManagement')}</div>
+      {/* Use suppressHydrationWarning for text mismatch */}
+      <div className={styles.title} suppressHydrationWarning>
+        {t('formManagement')}
+      </div>
       <div className={styles.centerBox}>
         <PersonForm
           editingPerson={editingPerson}

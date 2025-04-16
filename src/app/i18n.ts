@@ -4,6 +4,7 @@ import { initReactI18next } from 'react-i18next';
 const resources = {
   en: {
     translation: {
+      selectDate: "Select Date",
       test1: "Test 1",
       desc1: "Layout & Style",
       test2: "Test 2",
@@ -65,6 +66,7 @@ const resources = {
   },
   th: {
     translation: {
+      selectDate: "เลือกวันที่",
       test1: "ทดสอบ 1",
       desc1: "การจัดวางและการสไตล์",
       test2: "ทดสอบ 2",
