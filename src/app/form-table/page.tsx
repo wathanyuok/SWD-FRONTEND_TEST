@@ -10,9 +10,10 @@ import PersonTable from '@/components/PersonTable';
 export default function FormTablePage() {
   const { t, i18n } = useTranslation();
   const router = useRouter();
-  const [language, setLanguage] = useState(i18n.language || 'en'); 
+  const [language, setLanguage] = useState(i18n.language || 'en'); // กำหนดค่าเริ่มต้นของภาษา
   const [editingPerson, setEditingPerson] = useState(null);
 
+  // Load language from Local Storage after component mounts
   useEffect(() => {
     const savedLanguage = localStorage.getItem("i18nextLng") || "en";
     setLanguage(savedLanguage);
@@ -31,8 +32,9 @@ export default function FormTablePage() {
   return (
     <div className={styles.gradientBg}>
       <div className={styles.topBar}>
+        {/* Use value instead of defaultValue */}
         <Select
-          value={language} 
+          value={language} // ใช้ State แทน defaultValue
           style={{ width: 80 }}
           onChange={(lng) => {
             setLanguage(lng);
@@ -42,7 +44,7 @@ export default function FormTablePage() {
             { value: 'en', label: 'EN' },
             { value: 'th', label: 'ไทย' },
           ]}
-          popupMatchSelectWidth={false} 
+          popupMatchSelectWidth={false} // Replace deprecated API
           className={styles.langSelect}
         />
         <Button
@@ -52,6 +54,7 @@ export default function FormTablePage() {
           {language === 'th' ? 'หน้าหลัก' : 'Home'}
         </Button>
       </div>
+      {/* Use suppressHydrationWarning for text mismatch */}
       <div className={styles.title} suppressHydrationWarning>
         {t('formManagement')}
       </div>

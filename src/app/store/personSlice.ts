@@ -8,11 +8,6 @@ interface Person {
   dob: string | null;
   nationality: string;
   citizenId: string;
-  citizenId1?: string;
-  citizenId2?: string;
-  citizenId3?: string;
-  citizenId4?: string;
-  citizenId5?: string;
   gender: 'male' | 'female' | 'other';
   phoneCode: string;
   phoneNumber: string;
@@ -25,40 +20,56 @@ interface PersonState {
   persons: Person[];
   currentPage: number;
   itemsPerPage: number;
-  totalItems: number;
 }
 
+// โหลดข้อมูลจาก localStorage
 const loadFromLocalStorage = (): Person[] => {
   if (typeof window !== 'undefined') {
-    const data = localStorage.getItem('persons');
-    return data ? JSON.parse(data) : [];
+    try {
+      const data = localStorage.getItem('persons');
+      return data ? JSON.parse(data) : [];
+    } catch (error) {
+      console.error("Error loading from localStorage:", error);
+      return [];
+    }
   }
   return [];
 };
 
+// บันทึกข้อมูลลง localStorage
 const saveToLocalStorage = (persons: Person[]) => {
   if (typeof window !== 'undefined') {
-    localStorage.setItem('persons', JSON.stringify(persons));
+    try {
+      localStorage.setItem('persons', JSON.stringify(persons));
+    } catch (error) {
+      console.error("Error saving to localStorage:", error);
+    }
   }
 };
 
+// คำนวณหน้าสูงสุด
+const getMaxPage = (totalItems: number, itemsPerPage: number): number => {
+  return Math.max(Math.ceil(totalItems / itemsPerPage), 1); // ให้มีอย่างน้อย 1 หน้า
+};
+
+// สถานะเริ่มต้น
 const initialState: PersonState = {
   persons: loadFromLocalStorage(),
   currentPage: 1,
-  itemsPerPage: 5,
-  totalItems: loadFromLocalStorage().length,
+  itemsPerPage: 2, // จำนวนรายการต่อหน้า
 };
 
 const personSlice = createSlice({
   name: 'person',
   initialState,
   reducers: {
+    // เพิ่มข้อมูลบุคคล
     addPerson: (state, action: PayloadAction<Person>) => {
       state.persons.push(action.payload);
-      state.totalItems = state.persons.length;
       saveToLocalStorage(state.persons);
     },
-    
+
+    // อัพเดทข้อมูลบุคคล
     updatePerson: (state, action: PayloadAction<Person>) => {
       const index = state.persons.findIndex(p => p.id === action.payload.id);
       if (index !== -1) {
@@ -66,53 +77,57 @@ const personSlice = createSlice({
         saveToLocalStorage(state.persons);
       }
     },
-    
+
+    // ลบข้อมูลบุคคล
     deletePerson: (state, action: PayloadAction<string>) => {
       state.persons = state.persons.filter(p => p.id !== action.payload);
-      state.totalItems = state.persons.length;
       
-      const maxPage = Math.ceil(state.totalItems / state.itemsPerPage);
-      if (state.currentPage > maxPage && maxPage > 0) {
+      // ตรวจสอบว่าหน้าปัจจุบันยังคงถูกต้องหลังจากลบข้อมูล
+      const maxPage = getMaxPage(state.persons.length, state.itemsPerPage);
+      if (state.currentPage > maxPage) {
         state.currentPage = maxPage;
       }
       
       saveToLocalStorage(state.persons);
     },
-    
+
+    // ลบข้อมูลบุคคลที่เลือก
     deleteSelectedPersons: (state, action: PayloadAction<string[]>) => {
       state.persons = state.persons.filter(p => !action.payload.includes(p.id));
-      state.totalItems = state.persons.length;
       
-      const maxPage = Math.ceil(state.totalItems / state.itemsPerPage);
-      if (state.currentPage > maxPage && maxPage > 0) {
+      // ตรวจสอบว่าหน้าปัจจุบันยังคงถูกต้องหลังจากลบข้อมูล
+      const maxPage = getMaxPage(state.persons.length, state.itemsPerPage);
+      if (state.currentPage > maxPage) {
         state.currentPage = maxPage;
       }
       
       saveToLocalStorage(state.persons);
     },
-    
+
+    // กำหนดหน้าปัจจุบัน
     setCurrentPage: (state, action: PayloadAction<number>) => {
-      state.currentPage = action.payload;
+      // ตรวจสอบว่าหน้าที่จะกำหนดอยู่ในช่วงที่ถูกต้อง
+      const maxPage = getMaxPage(state.persons.length, state.itemsPerPage);
+      state.currentPage = Math.min(Math.max(1, action.payload), maxPage);
     },
-    
+
+    // กำหนดจำนวนรายการต่อหน้า
     setItemsPerPage: (state, action: PayloadAction<number>) => {
       state.itemsPerPage = action.payload;
       
-      const maxPage = Math.ceil(state.totalItems / state.itemsPerPage);
-      if (state.currentPage > maxPage && maxPage > 0) {
-        state.currentPage = maxPage;
-      }
-    }
+      // เมื่อเปลี่ยนจำนวนรายการต่อหน้า ให้กลับไปหน้าแรก
+      state.currentPage = 1;
+    },
   },
 });
 
-export const { 
-  addPerson, 
-  updatePerson, 
-  deletePerson, 
-  deleteSelectedPersons, 
+export const {
+  addPerson,
+  updatePerson,
+  deletePerson,
+  deleteSelectedPersons,
   setCurrentPage,
-  setItemsPerPage
+  setItemsPerPage,
 } = personSlice.actions;
 
 export default personSlice.reducer;

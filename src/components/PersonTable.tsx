@@ -1,10 +1,13 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Table, Button, Checkbox, Space, Pagination } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useSelector, useDispatch } from 'react-redux';
-import { deletePerson, deleteSelectedPersons, setCurrentPage } from '@/app/store/personSlice';
+import {
+  deletePerson,
+  deleteSelectedPersons,
+  setCurrentPage,
+} from '@/app/store/personSlice';
 import { RootState } from '@/app/store';
-
 
 interface PersonTableProps {
   onEditPerson: (person: any) => void;
@@ -15,22 +18,32 @@ const PersonTable: React.FC<PersonTableProps> = ({ onEditPerson }) => {
   const dispatch = useDispatch();
   const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]);
   
-  const { persons, currentPage, itemsPerPage, totalItems } = useSelector(
+  // ดึงข้อมูลจาก Redux store
+  const { persons, currentPage, itemsPerPage } = useSelector(
     (state: RootState) => state.person
   );
 
-  const getCurrentPageData = () => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    return persons.slice(startIndex, endIndex);
-  };
+  // คำนวณจำนวนข้อมูลทั้งหมด
+  const totalItems = persons.length;
+  
+  // คำนวณข้อมูลที่จะแสดงในหน้าปัจจุบัน
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentPageData = persons.slice(startIndex, endIndex);
+  
+  // รีเซ็ตการเลือกเมื่อเปลี่ยนหน้า
+  useEffect(() => {
+    setSelectedRowKeys([]);
+  }, [currentPage]);
 
+  // จัดการการลบข้อมูล
   const handleDelete = (id: string) => {
     if (window.confirm(t('confirmDelete'))) {
       dispatch(deletePerson(id));
     }
   };
 
+  // จัดการการลบข้อมูลที่เลือก
   const handleDeleteSelected = () => {
     if (selectedRowKeys.length === 0) return;
     if (window.confirm(t('confirmDelete'))) {
@@ -39,10 +52,12 @@ const PersonTable: React.FC<PersonTableProps> = ({ onEditPerson }) => {
     }
   };
 
+  // จัดการการเลือกแถว
   const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
     setSelectedRowKeys(newSelectedRowKeys as string[]);
   };
 
+  // จัดการการเปลี่ยนหน้า
   const handlePageChange = (page: number) => {
     dispatch(setCurrentPage(page));
   };
@@ -56,7 +71,8 @@ const PersonTable: React.FC<PersonTableProps> = ({ onEditPerson }) => {
     {
       title: t('name'),
       key: 'name',
-      render: (_: any, record: any) => `${record.firstName} ${record.lastName}`,
+      render: (_: any, record: any) =>
+        `${record.firstName} ${record.lastName}`,
     },
     {
       title: t('gender'),
@@ -80,9 +96,7 @@ const PersonTable: React.FC<PersonTableProps> = ({ onEditPerson }) => {
       key: 'actions',
       render: (_: any, record: any) => (
         <Space size="middle">
-          <Button onClick={() => onEditPerson(record)}>
-            {t('edit')}
-          </Button>
+          <Button onClick={() => onEditPerson(record)}>{t('edit')}</Button>
           <Button danger onClick={() => handleDelete(record.id)}>
             {t('delete')}
           </Button>
@@ -93,21 +107,28 @@ const PersonTable: React.FC<PersonTableProps> = ({ onEditPerson }) => {
 
   return (
     <div>
+      {/* เลือกทั้งหมดและปุ่มลบ */}
       <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center' }}>
         <Checkbox
-          checked={selectedRowKeys.length === getCurrentPageData().length && getCurrentPageData().length > 0}
-          indeterminate={selectedRowKeys.length > 0 && selectedRowKeys.length < getCurrentPageData().length}
+          checked={
+            selectedRowKeys.length === currentPageData.length &&
+            currentPageData.length > 0
+          }
+          indeterminate={
+            selectedRowKeys.length > 0 &&
+            selectedRowKeys.length < currentPageData.length
+          }
           onChange={(e) => {
-            const newSelectedRowKeys = e.target.checked
-              ? getCurrentPageData().map((item) => item.id)
+            const newKeys = e.target.checked
+              ? currentPageData.map((item) => item.id)
               : [];
-            setSelectedRowKeys(newSelectedRowKeys);
+            setSelectedRowKeys(newKeys);
           }}
         >
           {t('selectAll')}
         </Checkbox>
-        <Button 
-          danger 
+        <Button
+          danger
           disabled={selectedRowKeys.length === 0}
           onClick={handleDeleteSelected}
           style={{ marginLeft: 8 }}
@@ -116,15 +137,18 @@ const PersonTable: React.FC<PersonTableProps> = ({ onEditPerson }) => {
         </Button>
       </div>
 
+      {/* ตาราง */}
       <Table
+        key={`table-${currentPage}`} // เพิ่ม key เพื่อบังคับให้ re-render เมื่อเปลี่ยนหน้า
         rowSelection={rowSelection}
         columns={columns}
-        dataSource={getCurrentPageData()}
+        dataSource={currentPageData}
         rowKey="id"
         pagination={false}
         bordered
       />
 
+      {/* Pagination */}
       <div style={{ marginTop: 16, textAlign: 'right' }}>
         <Pagination
           current={currentPage}

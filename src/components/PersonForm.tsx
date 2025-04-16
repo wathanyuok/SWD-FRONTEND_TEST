@@ -4,11 +4,12 @@ import { useTranslation } from 'react-i18next';
 import { v4 as uuidv4 } from 'uuid';
 import { useDispatch } from 'react-redux';
 import { addPerson, updatePerson } from '@/app/store/personSlice';
-import dayjs from 'dayjs'; 
+import dayjs from 'dayjs';
 import "flag-icons/css/flag-icons.min.css";
 
 const { Option } = Select;
 
+// ตัวเลือกประเทศสำหรับรหัสโทรศัพท์
 const countryOptions = [
   { value: "+66", label: "Thailand", flag: "th" },
   { value: "+1", label: "USA", flag: "us" },
@@ -16,15 +17,17 @@ const countryOptions = [
   { value: "+84", label: "Vietnam", flag: "vn" },
 ];
 
+// ตัวเลือกสัญชาติ
 const nationalities = [
   { value: "thai", label: "Thai" },
   { value: "lao", label: "Lao" },
   { value: "other", label: "Other" },
 ];
 
+// คอมโพเนนต์สำหรับแสดง * ข้าง label ฟิลด์ที่บังคับกรอก
 const Required = ({ children }: { children: React.ReactNode }) => (
-  <span>
-    <span style={{ color: "red" }}></span> {children}
+  <span suppressHydrationWarning>
+    <span style={{ color: "red" }}>*</span> {children}
   </span>
 );
 
@@ -33,9 +36,11 @@ const PersonForm = ({ editingPerson = null, onFinishForm = () => {} }) => {
   const [form] = Form.useForm();
   const dispatch = useDispatch();
 
+  // เมื่อมีข้อมูลสำหรับแก้ไข ให้เติมค่าในฟอร์ม
   useEffect(() => {
     if (editingPerson) {
       const citizenIdParts = editingPerson.citizenId ? editingPerson.citizenId.split('-') : [];
+      const phoneInfo = editingPerson.phone ? editingPerson.phone.split('-') : ['+66', ''];
       const formValues = {
         ...editingPerson,
         citizenId1: citizenIdParts[0] || '',
@@ -43,7 +48,9 @@ const PersonForm = ({ editingPerson = null, onFinishForm = () => {} }) => {
         citizenId3: citizenIdParts[2] || '',
         citizenId4: citizenIdParts[3] || '',
         citizenId5: citizenIdParts[4] || '',
-        dob: editingPerson.dob ? dayjs(editingPerson.dob) : null, 
+        phoneCode: phoneInfo[0] || '+66',
+        phoneNumber: phoneInfo[1] || '',
+        dob: editingPerson.dob ? dayjs(editingPerson.dob) : null,
       };
       form.setFieldsValue(formValues);
     } else {
@@ -51,7 +58,9 @@ const PersonForm = ({ editingPerson = null, onFinishForm = () => {} }) => {
     }
   }, [editingPerson, form]);
 
+  // จัดการเมื่อ submit ฟอร์ม
   const handleSubmit = (values) => {
+    // รวม citizenId จาก 5 ช่อง
     const citizenId = [
       values.citizenId1,
       values.citizenId2,
@@ -60,16 +69,19 @@ const PersonForm = ({ editingPerson = null, onFinishForm = () => {} }) => {
       values.citizenId5,
     ].join('-');
 
+    // รวมเบอร์โทรศัพท์
     const phone = `${values.phoneCode}-${values.phoneNumber}`;
 
+    // สร้างข้อมูลบุคคล
     const personData = {
       id: editingPerson?.id || uuidv4(),
       ...values,
       citizenId,
       phone,
-      dob: values.dob ? values.dob.format("YYYY-MM-DD") : null, 
+      dob: values.dob ? values.dob.format("YYYY-MM-DD") : null,
     };
 
+    // ส่งข้อมูลไป Redux
     if (editingPerson) {
       dispatch(updatePerson(personData));
     } else {
@@ -89,9 +101,10 @@ const PersonForm = ({ editingPerson = null, onFinishForm = () => {} }) => {
         prefix: "",
         gender: "male",
         nationality: "",
-        phoneCode: "+66", 
+        phoneCode: "+66",
       }}
     >
+      {/* แถว 1: คำนำหน้า, ชื่อ, นามสกุล */}
       <Row gutter={16}>
         <Col span={4}>
           <Form.Item
@@ -126,6 +139,7 @@ const PersonForm = ({ editingPerson = null, onFinishForm = () => {} }) => {
         </Col>
       </Row>
 
+      {/* แถว 2: วันเกิด, สัญชาติ */}
       <Row gutter={16}>
         <Col span={6}>
           <Form.Item
@@ -136,7 +150,7 @@ const PersonForm = ({ editingPerson = null, onFinishForm = () => {} }) => {
             <DatePicker
               style={{ width: "100%" }}
               format="YYYY-MM-DD"
-              placeholder={t("selectDate")} 
+              placeholder={t("selectDate")}
             />
           </Form.Item>
         </Col>
@@ -155,6 +169,7 @@ const PersonForm = ({ editingPerson = null, onFinishForm = () => {} }) => {
         </Col>
       </Row>
 
+      {/* แถว 3: รหัสบัตรประชาชน 5 ช่อง */}
       <Row gutter={8}>
         <Col span={4}>
           <Form.Item name="citizenId1" label={t("citizenId")}>
@@ -183,6 +198,7 @@ const PersonForm = ({ editingPerson = null, onFinishForm = () => {} }) => {
         </Col>
       </Row>
 
+      {/* แถว 4: เพศ */}
       <Row gutter={16}>
         <Col span={8}>
           <Form.Item
@@ -199,6 +215,7 @@ const PersonForm = ({ editingPerson = null, onFinishForm = () => {} }) => {
         </Col>
       </Row>
 
+      {/* แถว 5: เบอร์โทรศัพท์ */}
       <Row gutter={8} align="middle">
         <Col flex="160px">
           <Form.Item
@@ -208,8 +225,9 @@ const PersonForm = ({ editingPerson = null, onFinishForm = () => {} }) => {
           >
             <Select
               style={{ width: "100%" }}
-              popupMatchSelectWidth={false} 
+              popupMatchSelectWidth={false}
               optionLabelProp="label"
+              value="+66"
             >
               {countryOptions.map((c) => (
                 <Option key={c.value} value={c.value} label={c.value}>
@@ -234,6 +252,7 @@ const PersonForm = ({ editingPerson = null, onFinishForm = () => {} }) => {
         </Col>
       </Row>
 
+      {/* แถว 6: เลขหนังสือเดินทาง */}
       <Row gutter={16}>
         <Col span={8}>
           <Form.Item name="passportNo" label={t("passportNo")}>
@@ -242,6 +261,7 @@ const PersonForm = ({ editingPerson = null, onFinishForm = () => {} }) => {
         </Col>
       </Row>
 
+      {/* แถว 7: เงินเดือนที่ต้องการ */}
       <Row gutter={16}>
         <Col span={8}>
           <Form.Item
@@ -254,6 +274,7 @@ const PersonForm = ({ editingPerson = null, onFinishForm = () => {} }) => {
         </Col>
       </Row>
 
+      {/* ปุ่ม submit และ reset */}
       <div style={{ display: "flex", justifyContent: "flex-end", gap: 12 }}>
         <Button htmlType="reset">{t("clear")}</Button>
         <Button type="primary" htmlType="submit">
