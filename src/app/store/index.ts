@@ -5,7 +5,6 @@ export const store = configureStore({
   reducer: {
     person: personReducer,
   },
-  // เปิดใช้ Redux DevTools ในโหมดพัฒนา
   devTools: process.env.NODE_ENV !== 'production',
 });
 

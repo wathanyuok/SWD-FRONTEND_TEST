@@ -18,32 +18,26 @@ const PersonTable: React.FC<PersonTableProps> = ({ onEditPerson }) => {
   const dispatch = useDispatch();
   const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]);
   
-  // ดึงข้อมูลจาก Redux store
   const { persons, currentPage, itemsPerPage } = useSelector(
     (state: RootState) => state.person
   );
 
-  // คำนวณจำนวนข้อมูลทั้งหมด
   const totalItems = persons.length;
   
-  // คำนวณข้อมูลที่จะแสดงในหน้าปัจจุบัน
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const currentPageData = persons.slice(startIndex, endIndex);
   
-  // รีเซ็ตการเลือกเมื่อเปลี่ยนหน้า
   useEffect(() => {
     setSelectedRowKeys([]);
   }, [currentPage]);
 
-  // จัดการการลบข้อมูล
   const handleDelete = (id: string) => {
     if (window.confirm(t('confirmDelete'))) {
       dispatch(deletePerson(id));
     }
   };
 
-  // จัดการการลบข้อมูลที่เลือก
   const handleDeleteSelected = () => {
     if (selectedRowKeys.length === 0) return;
     if (window.confirm(t('confirmDelete'))) {
@@ -52,12 +46,10 @@ const PersonTable: React.FC<PersonTableProps> = ({ onEditPerson }) => {
     }
   };
 
-  // จัดการการเลือกแถว
   const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
     setSelectedRowKeys(newSelectedRowKeys as string[]);
   };
 
-  // จัดการการเปลี่ยนหน้า
   const handlePageChange = (page: number) => {
     dispatch(setCurrentPage(page));
   };
@@ -107,7 +99,6 @@ const PersonTable: React.FC<PersonTableProps> = ({ onEditPerson }) => {
 
   return (
     <div>
-      {/* เลือกทั้งหมดและปุ่มลบ */}
       <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center' }}>
         <Checkbox
           checked={
@@ -137,9 +128,8 @@ const PersonTable: React.FC<PersonTableProps> = ({ onEditPerson }) => {
         </Button>
       </div>
 
-      {/* ตาราง */}
       <Table
-        key={`table-${currentPage}`} // เพิ่ม key เพื่อบังคับให้ re-render เมื่อเปลี่ยนหน้า
+        key={`table-${currentPage}`} 
         rowSelection={rowSelection}
         columns={columns}
         dataSource={currentPageData}
@@ -148,7 +138,6 @@ const PersonTable: React.FC<PersonTableProps> = ({ onEditPerson }) => {
         bordered
       />
 
-      {/* Pagination */}
       <div style={{ marginTop: 16, textAlign: 'right' }}>
         <Pagination
           current={currentPage}
