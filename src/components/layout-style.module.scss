@@ -1,0 +1,213 @@
+@use "sass:math";
+
+$green: #6EDA78;
+$yellow: #FFA200;
+$gray: #757575;
+$card-bg: #fff;
+$card-radius: 14px;
+$card-shadow: 0 2px 8px rgba(0,0,0,0.1);
+
+.container {
+  min-height: 100vh;
+  width: 100%;
+  padding: 30px;
+  background: linear-gradient(90deg, $green 0%, $yellow 100%);
+}
+
+.title {
+  font-size: 2.2rem;
+  font-weight: 500;
+  margin-bottom: 30px;
+  color: #222;
+  text-align: left;
+}
+
+.content {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+// ======== ส่วนแถวควบคุม ========
+.controlRow {
+  display: flex;
+  width: 100%;
+  max-width: 1200px;
+  padding-right: 15%;
+  margin-bottom: 30px;
+}
+
+.cardContainer {
+  background: $card-bg;
+  border-radius: $card-radius;
+  padding: 20px;
+  width: 250px;
+  height: 150px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 20px;
+  transition: background 0.2s;
+}
+
+.controlCenter {
+  width: 400px;
+}
+
+.buttonCard {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background: transparent;
+  border-radius: $card-radius;
+  transition: background 0.2s;
+}
+
+.activeButton {
+  background: $yellow !important;
+}
+
+.doubleButton {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  width: 80%;
+}
+
+.buttonLabel {
+  position: absolute;
+  bottom: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: $green;
+  color: white;
+  padding: 3px 15px;
+  border-radius: 15px;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+// ======== รูปทรงสามเหลี่ยม ========
+.triangleLeft {
+  width: 0;
+  height: 0;
+  border-top: 40px solid transparent;
+  border-right: 60px solid $gray;
+  border-bottom: 40px solid transparent;
+}
+
+.triangleRight {
+  width: 0;
+  height: 0;
+  border-top: 40px solid transparent;
+  border-left: 60px solid $gray;
+  border-bottom: 40px solid transparent;
+}
+
+.triangleUp {
+  width: 0;
+  height: 0;
+  border-left: 40px solid transparent;
+  border-right: 40px solid transparent;
+  border-bottom: 60px solid $gray;
+  margin-right: 20px;
+}
+
+.triangleDown {
+  width: 0;
+  height: 0;
+  border-left: 40px solid transparent;
+  border-right: 40px solid transparent;
+  border-top: 60px solid $gray;
+  margin-left: 20px;
+  cursor: pointer;
+}
+
+.activeTriangle {
+  // ไม่ต้องเปลี่ยนสีสามเหลี่ยม
+}
+
+// ======== ส่วนแถวรูปทรง (เหลื่อม) ========
+.shapeRow {
+  display: flex;
+  width: 100%;
+  max-width: 1200px;
+  margin-bottom: 20px;
+}
+
+// แถวกลาง (เหลื่อมไปทางขวา)
+.rowCenter {
+  justify-content: center;
+  padding-left: 10%;
+}
+
+// แถวล่าง (เหลื่อมไปทางซ้าย)
+.rowBottom {
+  justify-content: flex-start;
+  padding-left: 5%;
+}
+
+.shapeCard {
+  background: $card-bg;
+  border-radius: $card-radius;
+  padding: 20px;
+  width: 250px;
+  height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 20px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.activeShape {
+  background-color: $yellow !important;
+}
+
+// ======== รูปทรงต่างๆ ========
+.trapezoid {
+  width: 180px;
+  height: 0;
+  border-bottom: 80px solid $gray;
+  border-left: 30px solid transparent;
+  border-right: 30px solid transparent;
+}
+
+.rectangle {
+  width: 180px;
+  height: 80px;
+  background: $gray;
+}
+
+.parallelogram {
+  width: 180px;
+  height: 80px;
+  background: $gray;
+  transform: skew(-20deg);
+}
+
+.square {
+  width: 80px;
+  height: 80px;
+  background: $gray;
+}
+
+.circle {
+  width: 80px;
+  height: 80px;
+  background: $gray;
+  border-radius: 50%;
+}
+
+.ellipse {
+  width: 180px;
+  height: 80px;
+  background: $gray;
+  border-radius: 50%;
+}
