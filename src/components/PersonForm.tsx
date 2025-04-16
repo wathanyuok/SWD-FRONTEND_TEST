@@ -27,7 +27,7 @@ const nationalities = [
 // คอมโพเนนต์สำหรับแสดง * ข้าง label ฟิลด์ที่บังคับกรอก
 const Required = ({ children }: { children: React.ReactNode }) => (
   <span suppressHydrationWarning>
-    <span style={{ color: "red" }}>*</span> {children}
+    <span style={{ color: "red" }}></span> {children}
   </span>
 );
 
